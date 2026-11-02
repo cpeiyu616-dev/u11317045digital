@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>幾A幾B大挑戰｜數字猜謎</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: rgba(30, 30, 30, 0.75);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            --primary: #344e41;
+            --primary-hover: #3a5a40;
+            --accent: #588157;
+            --input-bg: #1e1e1e;
+            --input-border: #4a5568;
+            --input-focus: #588157;
+            --hint-bg: rgba(255, 255, 255, 0.05);
+            --btn-reset-bg: #2d3748;
+            --btn-reset-hover: #4a5568;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .header-tag {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+
+        .history-container {
+            background-color: var(--hint-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 12px 18px;
+            margin-bottom: 20px;
+            max-height: 140px;
+            overflow-y: auto;
+            text-align: left;
+            font-size: 0.95rem;
+        }
+
+        .history-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            color: var(--text-sub);
+        }
+
+        .history-item:last-child {
+            border-bottom: none;
+        }
+
+        .history-guess {
+            font-weight: 600;
+            color: var(--text-main);
+            letter-spacing: 2px;
+        }
+
+        .history-result {
+            font-weight: 700;
+            color: var(--accent);
+        }
+
+        .game-record-section {
+            margin-top: 25px;
+            background-color: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px;
+            text-align: left;
+        }
+
+        .game-record-title {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .game-record-list {
+            max-height: 100px;
+            overflow-y: auto;
+            font-size: 0.85rem;
+            color: var(--text-main);
+        }
+
+        .game-record-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            letter-spacing: 4px;
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="text"]::placeholder {
+            color: #4b5563;
+            letter-spacing: normal;
+        }
+
+        input[type="text"]:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(88, 129, 87, 0.2);
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-bottom: 20px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .message-box {
+            background-color: var(--hint-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 15px;
+            font-size: 1rem;
+            color: var(--text-main);
+            margin-bottom: 20px;
+            min-height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-reset {
+            background-color: var(--btn-reset-bg);
+            color: var(--text-main);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: var(--btn-reset-hover);
+        }
+
+        .tip-text {
+            color: var(--text-sub);
+        }
+
+        .footer-note {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            max-width: 580px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-tag">數位科技概論・幾A幾B版本</div>
+        <h1>幾A幾B大挑戰</h1>
+        <p class="description">電腦已隨機產生一個 4 位不重複數字。<br>請輸入 4 位數字來挑戰幾A幾B！</p>
+
+        <!-- 單局猜測歷程 -->
+        <div class="history-container" id="historyContainer" style="display: none;"></div>
+
+        <div class="input-group">
+            <label class="input-label" for="guessInput">輸入 4 位不重複數字</label>
+            <input type="text" id="guessInput" placeholder="例如 1234" maxlength="4" autocomplete="off">
+        </div>
+
+        <button class="btn-submit" id="submitBtn" type="button">猜看看</button>
+
+        <div class="message-box" id="messageBox">準備好了！請輸入 4 位數字開始。</div>
+
+        <div class="footer-actions">
+            <button class="btn-reset" id="resetBtn" type="button">下一局 / 重新開始</button>
+            <span class="tip-text">也可以按 Enter 送出</span>
+        </div>
+
+        <!-- 跨局歷史戰績總表 -->
+        <div class="game-record-section" id="gameRecordSection" style="display: none;">
+            <div class="game-record-title">
+                <span>🏆 歷史戰績紀錄</span>
+                <span id="totalGamesCount">已完成 0 局</span>
+            </div>
+            <div class="game-record-list" id="gameRecordList"></div>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        遊戲期間各局紀錄會完整保留，點擊「下一局」會自動計入戰績並開啟新局。
+    </div>
+
+    <script>
+        function generateSecret() {
+            let digits = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+            let secret = '';
+            for (let i = 0; i < 4; i++) {
+                const randomIndex = Math.floor(Math.random() * digits.length);
+                secret += digits[randomIndex];
+                digits.splice(randomIndex, 1);
+            }
+            return secret;
+        }
+
+        let secretNumber = generateSecret();
+        let gameOver = false;
+        let guessCount = 0;
+        let startTime = Date.now();
+        let gameRecords = [];
+
+        const guessInput = document.getElementById('guessInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const messageBox = document.getElementById('messageBox');
+        const historyContainer = document.getElementById('historyContainer');
+        const gameRecordSection = document.getElementById('gameRecordSection');
+        const gameRecordList = document.getElementById('gameRecordList');
+        const totalGamesCount = document.getElementById('totalGamesCount');
+
+        function handleGuess() {
+            if (gameOver) return;
+
+            const val = guessInput.value.trim();
+
+            if (val.length !== 4 || isNaN(val)) {
+                messageBox.textContent = "請輸入剛好 4 位的數字！";
+                messageBox.style.color = "#e76f51";
+                guessInput.value = '';
+                guessInput.focus();
+                return;
+            }
+
+            const uniqueDigits = new Set(val.split(''));
+            if (uniqueDigits.size !== 4) {
+                messageBox.textContent = "4位數字不能有重複喔！";
+                messageBox.style.color = "#e76f51";
+                guessInput.value = '';
+                guessInput.focus();
+                return;
+            }
+
+            guessCount++;
+
+            let A = 0;
+            let B = 0;
+            for (let i = 0; i < 4; i++) {
+                if (val[i] === secretNumber[i]) {
+                    A++;
+                } else if (secretNumber.includes(val[i])) {
+                    B++;
+                }
+            }
+
+            historyContainer.style.display = 'block';
+
+            const historyItem = document.createElement('div');
+            historyItem.className = 'history-item';
+            historyItem.innerHTML = `
+                <span>第 ${guessCount} 次：<span class="history-guess">${val}</span></span>
+                <span class="history-result">${A}A${B}B</span>
+            `;
+            historyContainer.appendChild(historyItem);
+            historyContainer.scrollTop = historyContainer.scrollHeight;
+
+            if (A === 4) {
+                const endTime = Date.now();
+                const durationSec = Math.floor((endTime - startTime) / 1000);
+
+                messageBox.textContent = `🎉 太神啦！花費 ${durationSec} 秒、猜了 ${guessCount} 次通關！`;
+                messageBox.style.color = "#81b29a";
+                submitBtn.textContent = "恭喜通關";
+                submitBtn.style.backgroundColor = "#2b9348";
+                gameOver = true;
+
+                // 紀錄這一局的成績到總表
+                gameRecords.push({
+                    gameNum: gameRecords.length + 1,
+                    guesses: guessCount,
+                    timeSec: durationSec,
+                    answer: secretNumber
+                });
+
+                updateGameRecordUI();
+            } else {
+                messageBox.textContent = `您猜的是 ${val}，結果為：${A}A${B}B`;
+                messageBox.style.color = "var(--text-main)";
+            }
+
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function updateGameRecordUI() {
+            gameRecordSection.style.display = 'block';
+            totalGamesCount.textContent = `已完成 ${gameRecords.length} 局`;
+            
+            gameRecordList.innerHTML = '';
+            gameRecords.forEach(record => {
+                const row = document.createElement('div');
+                row.className = 'game-record-row';
+                row.innerHTML = `
+                    <span>第 ${record.gameNum} 局 (答案: ${record.answer})</span>
+                    <span><strong>${record.guesses}</strong> 次 / <strong>${record.timeSec}</strong> 秒</span>
+                `;
+                gameRecordList.appendChild(row);
+            });
+        }
+
+        function resetGame() {
+            secretNumber = generateSecret();
+            gameOver = false;
+            guessCount = 0;
+            startTime = Date.now();
+            historyContainer.innerHTML = '';
+            historyContainer.style.display = 'none';
+            messageBox.textContent = "準備好了！請輸入 4 位數字開始。";
+            messageBox.style.color = "var(--text-main)";
+            submitBtn.textContent = "猜看看";
+            submitBtn.style.backgroundColor = "var(--primary)";
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        submitBtn.addEventListener('click', handleGuess);
+
+        guessInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                handleGuess();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetGame);
+
+        // 初始自動聚焦
+        guessInput.focus();
+    </script>
+</body>
+</html>
