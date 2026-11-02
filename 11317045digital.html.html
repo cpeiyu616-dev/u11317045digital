@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>你猜，我提示。｜數字猜謎</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: rgba(30, 30, 30, 0.75);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --text-main: #f3f4f6;
+            --text-sub: #9ca3af;
+            --primary: #344e41;
+            --primary-hover: #3a5a40;
+            --accent: #588157;
+            --input-bg: #1e1e1e;
+            --input-border: #4a5568;
+            --input-focus: #588157;
+            --hint-bg: rgba(255, 255, 255, 0.05);
+            --btn-reset-bg: #2d3748;
+            --btn-reset-hover: #4a5568;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 580px;
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6);
+            text-align: center;
+        }
+
+        .header-tag {
+            font-size: 0.85rem;
+            color: var(--text-sub);
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--text-main);
+            margin-bottom: 12px;
+            letter-spacing: 1px;
+        }
+
+        .description {
+            font-size: 0.95rem;
+            color: var(--text-sub);
+            line-height: 1.6;
+            margin-bottom: 35px;
+        }
+
+        .range-display {
+            font-size: 2.5rem;
+            font-weight: 600;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            letter-spacing: 2px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-label {
+            display: block;
+            text-align: left;
+            font-size: 0.9rem;
+            color: var(--text-sub);
+            margin-bottom: 8px;
+            padding-left: 5px;
+        }
+
+        input[type="number"] {
+            width: 100%;
+            padding: 16px 20px;
+            font-size: 1.5rem;
+            text-align: center;
+            background-color: var(--input-bg);
+            border: 2px solid var(--input-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            outline: none;
+            transition: all 0.3s ease;
+        }
+
+        input[type="number"]::placeholder {
+            color: #4b5563;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--input-focus);
+            box-shadow: 0 0 0 4px rgba(88, 129, 87, 0.2);
+        }
+
+        /* 隱藏數字輸入框上下箭頭 */
+        input[type="number"]::-webkit-inner-spin-button,
+        input[type="number"]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 16px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            background-color: var(--primary);
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background-color 0.2s, transform 0.1s;
+            margin-bottom: 20px;
+        }
+
+        .btn-submit:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+
+        .message-box {
+            background-color: var(--hint-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 12px;
+            padding: 18px;
+            font-size: 1.05rem;
+            color: var(--text-main);
+            margin-bottom: 25px;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .footer-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.9rem;
+        }
+
+        .btn-reset {
+            background-color: var(--btn-reset-bg);
+            color: var(--text-main);
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: var(--btn-reset-hover);
+        }
+
+        .tip-text {
+            color: var(--text-sub);
+        }
+
+        .footer-note {
+            margin-top: 30px;
+            font-size: 0.8rem;
+            color: #6b7280;
+            text-align: center;
+            max-width: 580px;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <div class="header-tag">數位科技概論・深色版本</div>
+        <h1>你猜，我提示。</h1>
+        <p class="description">電腦已選好一個 1 ~ 100 的整數。<br>根據「太大」或「太小」，一步步找到答案。</p>
+
+        <div class="range-display" id="rangeDisplay">1 － 100</div>
+
+        <div class="input-group">
+            <label class="input-label" for="guessInput">你猜的數字</label>
+            <input type="number" id="guessInput" placeholder="例如 50" min="1" max="100" autocomplete="off">
+        </div>
+
+        <button class="btn-submit" id="submitBtn">猜看看</button>
+
+        <div class="message-box" id="messageBox">準備好了！先猜一個數字吧。</div>
+
+        <div class="footer-actions">
+            <button class="btn-reset" id="resetBtn">重新開始</button>
+            <span class="tip-text">也可以按 Enter 送出</span>
+        </div>
+    </div>
+
+    <div class="footer-note">
+        這一版沒有帳號或存檔。重新開始、重新整理或關閉頁面後再開啟，都會重新新抽迴答案，不會保留紀錄。
+    </div>
+
+    <script>
+        let secretNumber = Math.floor(Math.random() * 100) + 1;
+        let minRange = 1;
+        let maxRange = 100;
+        let gameOver = false;
+
+        const guessInput = document.getElementById('guessInput');
+        const submitBtn = document.getElementById('submitBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const messageBox = document.getElementById('messageBox');
+        const rangeDisplay = document.getElementById('rangeDisplay');
+
+        function handleGuess() {
+            if (gameOver) return;
+
+            const userVal = parseInt(guessInput.value);
+
+            if (isNaN(userVal)) {
+                messageBox.textContent = "請輸入一個有效的數字！";
+                return;
+            }
+
+            if (userVal < minRange || userVal > maxRange) {
+                messageBox.textContent = `請輸入範圍在 ${minRange} ~ ${maxRange} 之間的數字！`;
+                return;
+            }
+
+            if (userVal === secretNumber) {
+                messageBox.textContent = `🎉 太神啦！答對了，答案就是 ${secretNumber}！`;
+                messageBox.style.color = "#81b29a";
+                rangeDisplay.textContent = `🎯 ${secretNumber}`;
+                submitBtn.textContent = "恭喜通關";
+                submitBtn.style.backgroundColor = "#2b9348";
+                gameOver = true;
+            } else if (userVal < secretNumber) {
+                minRange = Math.max(minRange, userVal + 1);
+                messageBox.textContent = `太小囉！再往大一點猜。`;
+                messageBox.style.color = "#f4a261";
+                rangeDisplay.textContent = `${minRange} － ${maxRange}`;
+            } else {
+                maxRange = Math.min(maxRange, userVal - 1);
+                messageBox.textContent = `太大囉！再往小一點猜。`;
+                messageBox.style.color = "#e76f51";
+                rangeDisplay.textContent = `${minRange} － ${maxRange}`;
+            }
+
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        function resetGame() {
+            secretNumber = Math.floor(Math.random() * 100) + 1;
+            minRange = 1;
+            maxRange = 100;
+            gameOver = false;
+            rangeDisplay.textContent = "1 － 100";
+            messageBox.textContent = "準備好了！先猜一個數字吧。";
+            messageBox.style.color = "var(--text-main)";
+            submitBtn.textContent = "猜看看";
+            submitBtn.style.backgroundColor = "var(--primary)";
+            guessInput.value = '';
+            guessInput.focus();
+        }
+
+        submitBtn.addEventListener('click', handleGuess);
+
+        guessInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                handleGuess();
+            }
+        });
+
+        resetBtn.addEventListener('click', resetGame);
+    </script>
+</body>
+</html>
